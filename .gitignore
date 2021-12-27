@@ -1,0 +1,9 @@
+*
+!.gitignore
+!init.vim
+
+!vscode
+!vscode/*.*
+
+!extra
+!extra/[!#]*.vim
