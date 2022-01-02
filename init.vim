@@ -27,11 +27,12 @@ call plug#begin(system('echo -n "${XDG_CONFIG_HOME:-$HOME/.config}/nvim/plugged"
 "Plug 'neoclide/coc.nvim', {'branch': 'release'}
     Plug 'neovim/nvim-lspconfig'
     Plug 'williamboman/nvim-lsp-installer'
+    Plug 'ojroques/nvim-lspfuzzy'
+    Plug 'hrsh7th/nvim-cmp'
     Plug 'hrsh7th/cmp-nvim-lsp'
     Plug 'hrsh7th/cmp-buffer'
     Plug 'hrsh7th/cmp-path'
     Plug 'hrsh7th/cmp-cmdline'
-    Plug 'hrsh7th/nvim-cmp'
     " For vsnip users.
     Plug 'hrsh7th/cmp-vsnip'
     Plug 'hrsh7th/vim-vsnip'
@@ -42,6 +43,8 @@ call plug#begin(system('echo -n "${XDG_CONFIG_HOME:-$HOME/.config}/nvim/plugged"
     Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
     Plug 'lervag/vimtex'
     Plug 'ziglang/zig.vim'
+    Plug 'untitled-ai/jupyter_ascending.vim'
+    Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
 " LANGS: end
 
 Plug 'tpope/vim-surround'
@@ -59,6 +62,7 @@ Plug 'lifepillar/vim-gruvbox8'
 Plug 'fladson/vim-kitty' "kitty.conf highlight
 Plug 'sheerun/vim-polyglot'
 Plug 'dpelle/vim-LanguageTool'
+Plug 'rcarriga/nvim-notify'
 call plug#end()
 
 set title
@@ -141,6 +145,19 @@ set noshowcmd
 
 " Splits open at the bottom and right, which is non-retarded, unlike vim defaults.
 	set splitbelow splitright
+
+" jupyter_ascending
+    nmap <leader>xx <Plug>JupyterExecute
+    nmap <leader>xX <Plug>JupyterExecuteAll
+" magma-nvim jupyter_client
+    nnoremap <silent><expr> <LocalLeader>r  :MagmaEvaluateOperator<CR>
+    nnoremap <silent>       <LocalLeader>rr :MagmaEvaluateLine<CR>
+    xnoremap <silent>       <LocalLeader>r  :<C-u>MagmaEvaluateVisual<CR>
+    nnoremap <silent>       <LocalLeader>rc :MagmaReevaluateCell<CR>
+    nnoremap <silent>       <LocalLeader>rd :MagmaDelete<CR>
+    nnoremap <silent>       <LocalLeader>ro :MagmaShowOutput<CR>
+
+    let g:magma_automatically_open_output = v:false
 
 " Nerd tree (nerdtree)
 	map <leader>n :NERDTreeToggle<CR>
@@ -284,6 +301,7 @@ nnoremap <leader>h :call ToggleHiddenAll()<CR>
 
 " lua stuff
 lua require('config')
+lua vim.notify = require('notify')
 
 " Vimtex
 augroup Vimtex
