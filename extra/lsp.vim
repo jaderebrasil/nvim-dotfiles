@@ -102,6 +102,18 @@ lua <<EOF
 		capabilities = capabilities
 	}
 
+	require('lspconfig')['pyright'].setup {
+		capabilities = capabilities
+	}
+
+	require('lspconfig')['pylsp'].setup {
+		capabilities = capabilities
+	}
+
+	require('lspconfig')['texlab'].setup {
+		capabilities = capabilities
+	}
+
     -- LSP Fuzzy
     -- map('n', '<space>,', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
     -- map('n', '<space>;', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
