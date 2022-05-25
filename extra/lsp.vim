@@ -46,6 +46,7 @@ highlight link CompeDocumentation NormalFloat
 lua <<EOF
   -- Setup nvim-cmp.
 	local cmp = require'cmp'
+    local lspconfig = require'lspconfig'
 
 	cmp.setup({
 		snippet = {
@@ -98,21 +99,51 @@ lua <<EOF
 	-- Setup lspconfig.
 	local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 	-- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-	require('lspconfig')['tsserver'].setup {
+	lspconfig['tsserver'].setup {
 		capabilities = capabilities
 	}
 
-	require('lspconfig')['pyright'].setup {
+	lspconfig['pyright'].setup {
 		capabilities = capabilities
 	}
 
-	require('lspconfig')['pylsp'].setup {
+	lspconfig['texlab'].setup {
 		capabilities = capabilities
 	}
 
-	require('lspconfig')['texlab'].setup {
-		capabilities = capabilities
-	}
+    -- hook to nvim-lspconfig
+    require("grammar-guard").init()
+
+--    local ltex_settings = function (lang) -- pt-BR or en
+--        return {
+--            enabled = { "latex", "tex", "bib", "markdown" },
+--            language = lang,
+--            diagnosticSeverity = "information",
+--            checkFrequency="save",
+--            setenceCacheSize = 5000,
+--            additionalRules = {
+--                enablePickyRules = true,
+--                motherTongue = lang,
+--            },
+--            trace = { server = "verbose" },
+--            dictionary = {},
+--            disabledRules = {},
+--            hiddenFalsePositives = {},
+--        }
+--    end
+--
+--    function GrammarGuardLanguage(lang)
+--        -- setup LSP config
+--        lspconfig['grammar_guard'].setup({
+--            capabilities = capabilities,
+--            cmd = { '/opt/ltex-ls-bin/bin/ltex-ls' },
+--            settings = {
+--                ltex = ltex_settings(lang),
+--            }
+--        })
+--
+--        vim.lsp.
+--    end
 
     -- LSP Fuzzy
     -- map('n', '<space>,', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')

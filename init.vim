@@ -33,10 +33,19 @@ call plug#begin(system('echo -n "${XDG_CONFIG_HOME:-$HOME/.config}/nvim/plugged"
     Plug 'hrsh7th/cmp-buffer'
     Plug 'hrsh7th/cmp-path'
     Plug 'hrsh7th/cmp-cmdline'
+    Plug 'nvim-lua/completion-nvim'
     " For vsnip users.
     Plug 'hrsh7th/cmp-vsnip'
     Plug 'hrsh7th/vim-vsnip'
 " LSP: end
+
+" WRITING: begin
+    Plug 'ellisonleao/glow.nvim'
+    Plug 'masukomi/vim-markdown-folding'
+    Plug 'brymer-meneses/grammar-guard.nvim'
+    "Plug 'rhysd/vim-grammarous'
+    "Plug 'dpelle/vim-LanguageTool'
+" WRITING: end
 
 " LANGS: begin
     Plug 'rust-lang/rust.vim'
@@ -47,27 +56,37 @@ call plug#begin(system('echo -n "${XDG_CONFIG_HOME:-$HOME/.config}/nvim/plugged"
     Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
 " LANGS: end
 
-Plug 'tpope/vim-surround'
-Plug 'preservim/nerdtree'
-Plug 'junegunn/goyo.vim'
-Plug 'jreybert/vimagit'
-Plug 'vimwiki/vimwiki'
-"Plug 'vim-airline/vim-airline'
-Plug 'itchyny/lightline.vim'						" Lightline statusbar
-Plug 'tpope/vim-commentary'
-Plug 'ap/vim-css-color'
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-Plug 'lifepillar/vim-gruvbox8'
-Plug 'fladson/vim-kitty' "kitty.conf highlight
-Plug 'sheerun/vim-polyglot'
-Plug 'dpelle/vim-LanguageTool'
-Plug 'rcarriga/nvim-notify'
+" GENERAL: begin
+    Plug 'tpope/vim-surround'
+    Plug 'junegunn/goyo.vim'
+    Plug 'jreybert/vimagit'
+    Plug 'vimwiki/vimwiki'
+    Plug 'tpope/vim-commentary'
+    Plug 'ap/vim-css-color'
+    Plug 'junegunn/fzf'
+    Plug 'junegunn/fzf.vim'
+    Plug 'lifepillar/vim-gruvbox8'
+    Plug 'fladson/vim-kitty' "kitty.conf highlight
+    Plug 'sheerun/vim-polyglot'
+    Plug 'rcarriga/nvim-notify'
+
+    Plug 'jpalardy/vim-slime' "using tmux
+
+    "Plug 'vim-airline/vim-airline'
+    Plug 'itchyny/lightline.vim'						" Lightline statusbar
+    "Plug 'glepnir/galaxyline.nvim' , {'branch': 'main'}
+
+    Plug 'preservim/nerdtree'
+    "Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    "Plug 'kyazdani42/nvim-web-devicons' " for file icons
+    "Plug 'kyazdani42/nvim-tree.lua'
+" GENERAL: end
 call plug#end()
 
 set title
 set bg=dark
 colo gruvbox8
+set guifont=FiraCode\ Nerd\ Font\ Mono:h16
 set go=a
 set mouse=a
 set nohlsearch
@@ -98,6 +117,8 @@ set noshowcmd
     set tw=79 "text width
 	set wrap linebreak "no wrap in middle of word
 
+" Splits open at the bottom and right, which is non-retarded, unlike vim defaults.
+	set splitbelow splitright
 
 " Enable autocompletion:
 	set wildmode=longest,list,full
@@ -111,8 +132,6 @@ set noshowcmd
 	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 " Perform dot commands over visual blocks:
 	vnoremap . :normal .<CR>
-" Goyo plugin makes text more readable when writing prose:
-	map <leader>mg :Goyo \| set bg=light \| set linebreak<CR>
 " Spell-check set to <leader>o, 'o' for 'orthography':
 	map <leader>oe :setlocal spell! spelllang=en_us<CR>
 	map <leader>op :setlocal spell! spelllang=pt<CR>
@@ -135,16 +154,19 @@ set noshowcmd
     map <Leader>fF :Rg<CR>
 
 " Grammar Check with LanguageTool
-    let g:languagetool_jar='/usr/share/java/languagetool/languagetool-commandline.jar'
-    let g:languagetool_cmd='/usr/bin/languagetool'
-    let g:languagetool_lang='en-US'
-    map <leader>lp :let g:languagetool_lang='pt-BR'<CR>
-    map <leader>lc :LanguageToolClear<CR>
-    map <leader>ll :LanguageToolCheck<CR>
-    " let g:languagetool_disable_rules='HUNSPELL_RULE'
+    "let g:languagetool_jar='/usr/share/java/languagetool/languagetool-commandline.jar'
+    "let g:languagetool_cmd='/usr/bin/languagetool'
+    "let g:languagetool_lang='en-US'
+    "map <leader>lp :let g:languagetool_lang='pt-BR'<CR>
+    "map <leader>lc :LanguageToolClear<CR>
+    "map <leader>ll :LanguageToolCheck<CR>
+    """let g:languagetool_disable_rules='HUNSPELL_RULE'
 
 " Splits open at the bottom and right, which is non-retarded, unlike vim defaults.
 	set splitbelow splitright
+
+" vim-slime
+    let g:slime_target = "tmux"
 
 " jupyter_ascending
     nmap <leader>xx <Plug>JupyterExecute
@@ -232,9 +254,11 @@ set noshowcmd
 " Save file as sudo on files that require root permission
 	cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!
 
+" Goyo plugin makes text more readable when writing prose:
+	map <leader>mg :Goyo \| set bg=dark \| set linebreak<CR>
 " Enable Goyo by default for mutt writing
-	autocmd BufRead,BufNewFile /tmp/neomutt* let g:goyo_width=80
-	autocmd BufRead,BufNewFile /tmp/neomutt* :Goyo | set bg=light
+	autocmd BufRead,BufNewFile /tmp/neomutt* let g:goyo_width=120
+	autocmd BufRead,BufNewFile /tmp/neomutt* :Goyo | set bg=dark
 	autocmd BufRead,BufNewFile /tmp/neomutt* map ZZ :Goyo\|x!<CR>
 	autocmd BufRead,BufNewFile /tmp/neomutt* map ZQ :Goyo\|q!<CR>
 
@@ -318,3 +342,22 @@ augroup END
 for f in split(glob('~/.config/nvim/extra/[^#]*.vim'), '\n')
 	exe 'source' f
 endfor
+
+" Function for toggling the bottom statusbar:
+let s:hidden_all = 1
+function! ToggleHiddenAll()
+    if s:hidden_all  == 0
+        let s:hidden_all = 1
+        set noshowmode
+        set noruler
+        set laststatus=0
+        set noshowcmd
+    else
+        let s:hidden_all = 0
+        set showmode
+        set ruler
+        set laststatus=2
+        set showcmd
+    endif
+endfunction
+nnoremap <leader>h :call ToggleHiddenAll()<CR>
