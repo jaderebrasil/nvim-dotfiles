@@ -9,8 +9,8 @@ lua <<EOF
     local opts = { noremap=true, silent=true }
     vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
     vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
-    vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
-    vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
+    vim.keymap.set('n', '<leader>ee', vim.diagnostic.open_float, opts)
+    vim.keymap.set('n', '<leader>qq', vim.diagnostic.setloclist, opts)
 
     -- Use an on_attach function to only map the following keys
     -- after the language server attaches to the current buffer
@@ -67,8 +67,8 @@ lua <<EOF
   		snippet = {
   			-- REQUIRED - you must specify a snippet engine
   			expand = function(args)
-  				-- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-  				require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+  				vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+  				-- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
   				-- require('snippy').expand_snippet(args.body) -- For `snippy` users.
   				-- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
   			end,
@@ -86,29 +86,11 @@ lua <<EOF
                 behavior = cmp.ConfirmBehavior.Replace,
                 select = true,
             }),
-            ['<Tab>'] = cmp.mapping(function(fallback)
-                if cmp.visible() then
-                  cmp.select_next_item()
-                elseif luasnip.expand_or_jumpable() then
-                  luasnip.expand_or_jump()
-                else
-                  fallback()
-                end
-            end, { 'i', 's' }),
-            ['<S-Tab>'] = cmp.mapping(function(fallback)
-                if cmp.visible() then
-                  cmp.select_prev_item()
-                elseif luasnip.jumpable(-1) then
-                  luasnip.jump(-1)
-                else
-                  fallback()
-                end
-            end, { 'i', 's' }),
         }),
   		sources = cmp.config.sources({
   			{ name = 'nvim_lsp' },
-  			-- { name = 'vsnip' }, -- For vsnip users.
-  			{ name = 'luasnip' }, -- For luasnip users.
+  			{ name = 'vsnip' }, -- For vsnip users.
+  			-- { name = 'luasnip' }, -- For luasnip users.
   			-- { name = 'ultisnips' }, -- For ultisnips users.
   			-- { name = 'snippy' }, -- For snippy users.
   		},

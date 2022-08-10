@@ -34,10 +34,10 @@ call plug#begin(system('echo -n "${XDG_CONFIG_HOME:-$HOME/.config}/nvim/plugged"
     Plug 'hrsh7th/cmp-path'
     Plug 'hrsh7th/cmp-cmdline'
     " For vsnip users.
-    Plug 'L3MON4D3/LuaSnip'
-    Plug 'saadparwaiz1/cmp_luasnip'
-    "Plug 'hrsh7th/cmp-vsnip'
-    "Plug 'hrsh7th/vim-vsnip'
+    " Plug 'L3MON4D3/LuaSnip'
+    " Plug 'saadparwaiz1/cmp_luasnip'
+    Plug 'hrsh7th/cmp-vsnip'
+    Plug 'hrsh7th/vim-vsnip'
 " LSP: end
 
 " WRITING: begin
