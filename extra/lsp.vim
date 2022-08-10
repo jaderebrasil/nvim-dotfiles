@@ -117,4 +117,6 @@ lua <<EOF
 
     -- hook to nvim-lspconfig
     require("grammar-guard").init()
+
+    require("trouble").setup{}
 EOF
