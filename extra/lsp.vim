@@ -1,157 +1,138 @@
 set completeopt=menu,menuone,noselect
 let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
 
-nnoremap <silent> gd :lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> gD :lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> gr :lua vim.lsp.buf.references()<CR>
-nnoremap <silent> <leader>K :lua vim.lsp.buf.signature_help()<CR>
-nnoremap <leader>rn :lua vim.lsp.buf.rename()<CR>
-nnoremap <leader>hh :lua vim.lsp.buf.hover()<CR>
-nnoremap <leader>ca :lua vim.lsp.buf.code_action()<CR>
-
-let g:compe = {}
-let g:compe.enabled = v:true
-let g:compe.autocomplete = v:true
-let g:compe.debug = v:false
-let g:compe.min_length = 1
-let g:compe.preselect = 'enable'
-let g:compe.throttle_time = 80
-let g:compe.source_timeout = 200
-let g:compe.resolve_timeout = 800
-let g:compe.incomplete_delay = 400
-let g:compe.max_abbr_width = 100
-let g:compe.max_kind_width = 100
-let g:compe.max_menu_width = 100
-let g:compe.documentation = v:true
-
-let g:compe.source = {}
-let g:compe.source.path = v:true
-let g:compe.source.buffer = v:true
-let g:compe.source.calc = v:true
-let g:compe.source.nvim_lsp = v:true
-let g:compe.source.nvim_lua = v:true
-let g:compe.source.vsnip = v:true
-let g:compe.source.ultisnips = v:true
-let g:compe.source.luasnip = v:true
-let g:compe.source.emoji = v:true
-
-
-"inoremap <silent><expr> <C-Space> compe#complete()
-"inoremap <silent><expr> <C-e>     compe#close('<C-e>')
-"inoremap <silent><expr> <C-f>     compe#scroll({ 'delta': +4 })
-"inoremap <silent><expr> <C-d>     compe#scroll({ 'delta': -4 })
-
 highlight link CompeDocumentation NormalFloat
 
 lua <<EOF
-  -- Setup nvim-cmp.
-	local cmp = require'cmp'
+    -- Mappings
+    -- See `:help vim.diagnostic.*` for documentation on any of the below functions
+    local opts = { noremap=true, silent=true }
+    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+    vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+    vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
+
+    -- Use an on_attach function to only map the following keys
+    -- after the language server attaches to the current buffer
+    local on_attach = function(client, bufnr)
+        -- Enable completion triggered by <c-x><c-o>
+        vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+        -- Mappings.
+        -- See `:help vim.lsp.*` for documentation on any of the below functions
+        local bufopts = { noremap=true, silent=true, buffer=bufnr }
+
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+        vim.keymap.set('n', 'gD', vim.lsp.buf.implementation, bufopts)
+        vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+        vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+
+        vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+        vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+        vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+        vim.keymap.set('n', '<leader>wl', function()
+          print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        end, bufopts)
+
+        vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
+        vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+        vim.keymap.set('n', '<leader>hh', vim.lsp.buf.hover, bufopts)
+        vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+        vim.keymap.set('n', '<leader>f ', vim.lsp.buf.formatting, bufopts)
+    end
+
+    local lsp_flags = {
+      -- This is the default in Nvim 0.7+
+      debounce_text_changes = 150,
+    }
+
+    -- Add additional capabilities supported by nvim-cmp
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+
+  	local cmp = require'cmp'
     local lspconfig = require'lspconfig'
 
-	cmp.setup({
-		snippet = {
-			-- REQUIRED - you must specify a snippet engine
-			expand = function(args)
-				vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-				-- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-				-- require('snippy').expand_snippet(args.body) -- For `snippy` users.
-				-- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-			end,
-		},
-		mapping = {
-			['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-			['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-			['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-			['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
-			['<C-e>'] = cmp.mapping({
-				i = cmp.mapping.abort(),
-				c = cmp.mapping.close(),
-			}),
-			['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-		},
-		sources = cmp.config.sources({
-			{ name = 'nvim_lsp' },
-			{ name = 'vsnip' }, -- For vsnip users.
-			-- { name = 'luasnip' }, -- For luasnip users.
-			-- { name = 'ultisnips' }, -- For ultisnips users.
-			-- { name = 'snippy' }, -- For snippy users.
-		}, {
-			{ name = 'buffer' },
-		})
-	})
+    -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
+    local servers = { 'pylsp', 'texlab', 'pyright', 'tsserver' }
+    for _, lsp in ipairs(servers) do
+      lspconfig[lsp].setup {
+        on_attach = on_attach,
+        flags = lsp_flags,
+        capabilities = capabilities,
+      }
+    end
 
-	-- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-	cmp.setup.cmdline('/', {
-		sources = {
-			{ name = 'buffer' }
-		}
-	})
+  	cmp.setup({
+  		snippet = {
+  			-- REQUIRED - you must specify a snippet engine
+  			expand = function(args)
+  				-- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+  				require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+  				-- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+  				-- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+  			end,
+  		},
+  		mapping = cmp.mapping.preset.insert({
+  			['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+  			['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+  			['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+  			['<C-y>'] = cmp.config.disable,
+            ['<C-e>'] = cmp.mapping({
+  				i = cmp.mapping.abort(),
+  				c = cmp.mapping.close(),
+  			}),
+  			['<CR>'] = cmp.mapping.confirm({
+                behavior = cmp.ConfirmBehavior.Replace,
+                select = true,
+            }),
+            ['<Tab>'] = cmp.mapping(function(fallback)
+                if cmp.visible() then
+                  cmp.select_next_item()
+                elseif luasnip.expand_or_jumpable() then
+                  luasnip.expand_or_jump()
+                else
+                  fallback()
+                end
+            end, { 'i', 's' }),
+            ['<S-Tab>'] = cmp.mapping(function(fallback)
+                if cmp.visible() then
+                  cmp.select_prev_item()
+                elseif luasnip.jumpable(-1) then
+                  luasnip.jump(-1)
+                else
+                  fallback()
+                end
+            end, { 'i', 's' }),
+        }),
+  		sources = cmp.config.sources({
+  			{ name = 'nvim_lsp' },
+  			-- { name = 'vsnip' }, -- For vsnip users.
+  			{ name = 'luasnip' }, -- For luasnip users.
+  			-- { name = 'ultisnips' }, -- For ultisnips users.
+  			-- { name = 'snippy' }, -- For snippy users.
+  		},
+        {
+  		    { name = 'buffer' },
+  		})
+  	})
 
-	-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-	cmp.setup.cmdline(':', {
-		sources = cmp.config.sources({
-			{ name = 'path' }
-		}, {
-			{ name = 'cmdline' }
-		})
-	})
+  	-- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+  	cmp.setup.cmdline('/', {
+  		sources = {
+  			{ name = 'buffer' }
+  		}
+  	})
 
-	-- Setup lspconfig.
-	local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-	-- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-	lspconfig['tsserver'].setup {
-		capabilities = capabilities
-	}
-
-	lspconfig['pyright'].setup {
-		capabilities = capabilities
-	}
-
-	lspconfig['texlab'].setup {
-		capabilities = capabilities
-	}
+  	-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  	cmp.setup.cmdline(':', {
+  		sources = cmp.config.sources({
+  			{ name = 'path' }
+  		}, {
+  			{ name = 'cmdline' }
+  		})
+  	})
 
     -- hook to nvim-lspconfig
     require("grammar-guard").init()
-
---    local ltex_settings = function (lang) -- pt-BR or en
---        return {
---            enabled = { "latex", "tex", "bib", "markdown" },
---            language = lang,
---            diagnosticSeverity = "information",
---            checkFrequency="save",
---            setenceCacheSize = 5000,
---            additionalRules = {
---                enablePickyRules = true,
---                motherTongue = lang,
---            },
---            trace = { server = "verbose" },
---            dictionary = {},
---            disabledRules = {},
---            hiddenFalsePositives = {},
---        }
---    end
---
---    function GrammarGuardLanguage(lang)
---        -- setup LSP config
---        lspconfig['grammar_guard'].setup({
---            capabilities = capabilities,
---            cmd = { '/opt/ltex-ls-bin/bin/ltex-ls' },
---            settings = {
---                ltex = ltex_settings(lang),
---            }
---        })
---
---        vim.lsp.
---    end
-
-    -- LSP Fuzzy
-    -- map('n', '<space>,', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
-    -- map('n', '<space>;', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
-    -- map('n', '<space>d', '<cmd>lua vim.lsp.buf.definition()<CR>')
-    -- map('n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>')
-    -- map('n', '<space>h', '<cmd>lua vim.lsp.buf.hover()<CR>')
-    -- map('n', '<space>m', '<cmd>lua vim.lsp.buf.rename()<CR>')
-    -- map('n', '<space>r', '<cmd>lua vim.lsp.buf.references()<CR>')
-    -- map('n', '<space>s', '<cmd>lua vim.lsp.buf.document_symbol()<CR>')
 EOF

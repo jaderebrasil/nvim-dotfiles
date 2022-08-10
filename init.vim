@@ -33,10 +33,11 @@ call plug#begin(system('echo -n "${XDG_CONFIG_HOME:-$HOME/.config}/nvim/plugged"
     Plug 'hrsh7th/cmp-buffer'
     Plug 'hrsh7th/cmp-path'
     Plug 'hrsh7th/cmp-cmdline'
-    Plug 'nvim-lua/completion-nvim'
     " For vsnip users.
-    Plug 'hrsh7th/cmp-vsnip'
-    Plug 'hrsh7th/vim-vsnip'
+    Plug 'L3MON4D3/LuaSnip'
+    Plug 'saadparwaiz1/cmp_luasnip'
+    "Plug 'hrsh7th/cmp-vsnip'
+    "Plug 'hrsh7th/vim-vsnip'
 " LSP: end
 
 " WRITING: begin
@@ -54,6 +55,8 @@ call plug#begin(system('echo -n "${XDG_CONFIG_HOME:-$HOME/.config}/nvim/plugged"
     Plug 'ziglang/zig.vim'
     Plug 'untitled-ai/jupyter_ascending.vim'
     Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
+    "Plug 'rafi/vim-venom', { 'for': 'python' }
+    Plug 'stsewd/sphinx.nvim', { 'do': ':UpdateRemotePlugins' }
 " LANGS: end
 
 " GENERAL: begin
@@ -76,8 +79,10 @@ call plug#begin(system('echo -n "${XDG_CONFIG_HOME:-$HOME/.config}/nvim/plugged"
     Plug 'itchyny/lightline.vim'						" Lightline statusbar
     "Plug 'glepnir/galaxyline.nvim' , {'branch': 'main'}
 
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    Plug 'nvim-lua/plenary.nvim'
+
     Plug 'preservim/nerdtree'
-    "Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     "Plug 'kyazdani42/nvim-web-devicons' " for file icons
     "Plug 'kyazdani42/nvim-tree.lua'
 " GENERAL: end
@@ -326,9 +331,7 @@ function! ToggleHiddenAll()
 endfunction
 nnoremap <leader>h :call ToggleHiddenAll()<CR>
 
-
 " lua stuff
-lua require('config')
 lua vim.notify = require('notify')
 
 " Vimtex
